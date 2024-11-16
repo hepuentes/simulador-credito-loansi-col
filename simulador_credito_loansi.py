@@ -42,27 +42,15 @@ def calcular_seguro_vida(plazo, seguro_vida_base):
     años = plazo // 12
     return seguro_vida_base * años if años >= 1 else 0
 
-# Estilos actualizados
+# Estilos
 st.markdown("""
     <style>
-        /* Estilos base */
-        .main {
-            font-family: 'Inter', sans-serif;
-            color: #E6E6E6;
-        }
-        
-        /* Contenedor principal */
-        .stApp {
-            background-color: #1E1E1E;
-        }
-        
-        /* Estilos actualizados para el select y descripciones */
         .stSelectbox {
             margin-top: 0.2rem !important;
         }
         
         .stSelectbox > div > div {
-            pointer-events: none;  /* Hace el campo no editable */
+            pointer-events: auto;
             background-color: #2D2D2D !important;
             border: 1px solid #404040 !important;
             color: #FFFFFF !important;
@@ -89,12 +77,10 @@ st.markdown("""
             margin-bottom: 0.5rem !important;
         }
 
-        /* Estilo para los números del slider */
         .stSlider > div > div > div {
             font-size: 1.2rem !important;
         }
 
-        /* Ajuste del campo de monto */
         .currency-symbol {
             font-size: 1.3rem;
             color: #FFFFFF;
@@ -102,7 +88,6 @@ st.markdown("""
             margin-left: 0.2rem;
         }
 
-        /* Resultado invertido */
         .result-box {
             background-color: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -124,38 +109,7 @@ st.markdown("""
             color: #FFFFFF !important;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        
-        /* Selectbox y inputs */
-        .stSelectbox > div > div {
-            background-color: #2D2D2D !important;
-            border: 1px solid #404040 !important;
-            color: #FFFFFF !important;
-        }
-        
-        .stNumberInput > div > div > input {
-            color: #FFFFFF !important;
-            background-color: #2D2D2D !important;
-            border: 1px solid #404040 !important;
-        }
-        
-        /* Resultado */
-        .result-box {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            text-align: center;
-        }
-        
-        .result-amount {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #FFFFFF !important;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        /* Sección de detalles */
+
         .detail-item {
             display: flex;
             justify-content: space-between;
@@ -171,34 +125,6 @@ st.markdown("""
             color: #FFFFFF;
             font-weight: 500;
         }
-        
-        /* WhatsApp section */
-        .whatsapp-section {
-            text-align: center;
-            margin: 2rem auto;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            max-width: 600px;
-        }
-        
-        .whatsapp-link {
-            display: inline-block;
-            background-color: #FADD01;
-            color: #000000 !important;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-top: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .whatsapp-link:hover {
-            background-color: #E5C901;
-            transform: translateY(-2px);
-        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -206,7 +132,7 @@ st.markdown("<h1>Simulador de Crédito Loansi</h1>", unsafe_allow_html=True)
 
 # Selección de línea de crédito
 st.markdown("<p style='color: #FFFFFF; font-size: 1.4rem; font-weight: 700; margin-bottom: 0.2rem;'>Selecciona la Línea de Crédito</p>", unsafe_allow_html=True)
-tipo_credito = st.selectbox("", options=LINEAS_DE_CREDITO.keys(), index=0, disabled=True)
+tipo_credito = st.selectbox("", options=LINEAS_DE_CREDITO.keys(), index=0, key="select_credito")
 detalles = LINEAS_DE_CREDITO[tipo_credito]
 
 st.markdown(f"<p class='description-text'>{detalles['descripcion']}</p>", unsafe_allow_html=True)
@@ -223,26 +149,25 @@ with col2:
                            min_value=detalles["monto_min"],
                            max_value=detalles["monto_max"],
                            step=1000,
-                           format="%d")
+                           format="%d",
+                           key="monto_input")
 
 # Slider de plazo con estilo mejorado
 if tipo_credito == "LoansiFlex":
     st.markdown("<p class='plazo-text'>Plazo en Meses</p>", unsafe_allow_html=True)
-    plazo = st.slider("", min_value=detalles["plazo_min"], max_value=detalles["plazo_max"], step=12)
+    plazo = st.slider("", 
+                     min_value=detalles["plazo_min"], 
+                     max_value=detalles["plazo_max"], 
+                     step=12,
+                     key="slider_meses")
     frecuencia_pago = "Mensual"
 else:
     st.markdown("<p class='plazo-text'>Plazo en Semanas</p>", unsafe_allow_html=True)
-    plazo = st.slider("", min_value=detalles["plazo_min"], max_value=detalles["plazo_max"], step=1)
-    frecuencia_pago = "Semanal"
-
-# Slider de plazo
-if tipo_credito == "LoansiFlex":
-    st.markdown("<p class='subtitle'>Plazo en Meses</p>", unsafe_allow_html=True)
-    plazo = st.slider("", min_value=detalles["plazo_min"], max_value=detalles["plazo_max"], step=12)
-    frecuencia_pago = "Mensual"
-else:
-    st.markdown("<p class='subtitle'>Plazo en Semanas</p>", unsafe_allow_html=True)
-    plazo = st.slider("", min_value=detalles["plazo_min"], max_value=detalles["plazo_max"], step=1)
+    plazo = st.slider("", 
+                     min_value=detalles["plazo_min"], 
+                     max_value=detalles["plazo_max"], 
+                     step=1,
+                     key="slider_semanas")
     frecuencia_pago = "Semanal"
 
 # Cálculos
@@ -258,13 +183,11 @@ else:
     tasa_semanal = ((1 + tasa_mensual) ** 0.25) - 1
     cuota = round((total_financiar * tasa_semanal) / (1 - (1 + tasa_semanal) ** -plazo))
 
-# Mostrar resultado
+# Mostrar resultado con orden invertido
 st.markdown(f"""
 <div class="result-box">
+    <p class="result-text">Pagarás {plazo} cuotas por un valor aproximado de:</p>
     <div class="result-amount">$ {format_number(cuota)} {frecuencia_pago}</div>
-    <p style="margin-top: 0.5rem; color: #B0B0B0;">
-        Pagarás {plazo} cuotas por un valor aproximado de:
-    </p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -298,14 +221,3 @@ with st.expander("Ver Detalles del Crédito"):
             <span class="detail-value">{valor}</span>
         </div>
         """, unsafe_allow_html=True)
-
-# Sección de WhatsApp
-st.markdown("""
-<div class="whatsapp-section">
-    <h3 style="color: #FFFFFF; margin-bottom: 1rem;">¿Interesado en solicitar este crédito?</h3>
-    <p style="color: #B0B0B0; margin-bottom: 1.5rem;">Para más información, comuníquese con nosotros por WhatsApp</p>
-    <a href="https://wa.me/XXXXXXXXXXX" target="_blank" class="whatsapp-link">
-        Hacer solicitud vía WhatsApp
-    </a>
-</div>
-""", unsafe_allow_html=True)
