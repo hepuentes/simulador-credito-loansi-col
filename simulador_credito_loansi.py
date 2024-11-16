@@ -56,42 +56,73 @@ st.markdown("""
             background-color: #1E1E1E;
         }
         
-        /* Títulos principales */
-        .main-title {
+        /* Estilos actualizados para el select y descripciones */
+        .stSelectbox {
+            margin-top: 0.2rem !important;
+        }
+        
+        .stSelectbox > div > div {
+            pointer-events: none;  /* Hace el campo no editable */
+            background-color: #2D2D2D !important;
+            border: 1px solid #404040 !important;
             color: #FFFFFF !important;
-            font-size: 1.4rem !important;
-            font-weight: 700 !important;
+            cursor: pointer;
+        }
+
+        .description-text {
+            color: #B0B0B0 !important;
+            font-size: 1.1rem !important;
+            margin: 0.8rem 0 !important;
+            line-height: 1.4 !important;
+        }
+
+        .value-description {
+            color: #B0B0B0 !important;
+            font-size: 1.1rem !important;
+            margin: 0.5rem 0 !important;
+        }
+
+        .plazo-text {
+            color: #FFFFFF !important;
+            font-size: 1.2rem !important;
+            font-weight: 600 !important;
             margin-bottom: 0.5rem !important;
         }
-        
-        /* Espaciado entre secciones */
-        .section-spacing {
-            margin-top: 2rem !important;
+
+        /* Estilo para los números del slider */
+        .stSlider > div > div > div {
+            font-size: 1.2rem !important;
         }
-        
-        /* Mejora del input con símbolo $ */
-        .currency-input {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
+
+        /* Ajuste del campo de monto */
         .currency-symbol {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: #FFFFFF;
-            padding-top: 0.3rem;
-            margin-left: 0.5rem;
+            margin-top: 0.7rem;
+            margin-left: 0.2rem;
         }
 
-        /* Ajuste del menú desplegable */
-        .stSelectbox {
-            margin-top: 0.3rem !important;
+        /* Resultado invertido */
+        .result-box {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
         }
-
-        .subtitle {
+        
+        .result-text {
+            font-size: 1.2rem;
             color: #B0B0B0;
-            font-size: 0.9rem;
-            margin: 0.5rem 0 1.5rem 0;
+            margin-bottom: 0.8rem;
+        }
+        
+        .result-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #FFFFFF !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
         /* Selectbox y inputs */
@@ -174,19 +205,17 @@ st.markdown("""
 st.markdown("<h1>Simulador de Crédito Loansi</h1>", unsafe_allow_html=True)
 
 # Selección de línea de crédito
-st.markdown("<p class='main-title'>Selecciona la Línea de Crédito</p>", unsafe_allow_html=True)
-tipo_credito = st.selectbox("", options=LINEAS_DE_CREDITO.keys(), index=0)
+st.markdown("<p style='color: #FFFFFF; font-size: 1.4rem; font-weight: 700; margin-bottom: 0.2rem;'>Selecciona la Línea de Crédito</p>", unsafe_allow_html=True)
+tipo_credito = st.selectbox("", options=LINEAS_DE_CREDITO.keys(), index=0, disabled=True)
 detalles = LINEAS_DE_CREDITO[tipo_credito]
 
-st.markdown(f"<p class='subtitle'>{detalles['descripcion']}</p>", unsafe_allow_html=True)
+st.markdown(f"<p class='description-text'>{detalles['descripcion']}</p>", unsafe_allow_html=True)
 
 # Entrada del monto con símbolo de peso
-st.markdown("<div class='section-spacing'></div>", unsafe_allow_html=True)
-st.markdown("<p class='main-title'>Escribe el valor del crédito</p>", unsafe_allow_html=True)
-st.markdown(f"<p class='subtitle'>Ingresa un valor entre $ {format_number(detalles['monto_min'])} y $ {format_number(detalles['monto_max'])} COP</p>", unsafe_allow_html=True)
+st.markdown("<p style='color: #FFFFFF; font-size: 1.4rem; font-weight: 700; margin: 1.5rem 0 0.2rem;'>Escribe el valor del crédito</p>", unsafe_allow_html=True)
+st.markdown(f"<p class='value-description'>Ingresa un valor entre $ {format_number(detalles['monto_min'])} y $ {format_number(detalles['monto_max'])} COP</p>", unsafe_allow_html=True)
 
-# Contenedor para el símbolo $ y el input
-col1, col2 = st.columns([1,20])
+col1, col2 = st.columns([0.5,20])
 with col1:
     st.markdown('<div class="currency-symbol">$</div>', unsafe_allow_html=True)
 with col2:
@@ -195,6 +224,16 @@ with col2:
                            max_value=detalles["monto_max"],
                            step=1000,
                            format="%d")
+
+# Slider de plazo con estilo mejorado
+if tipo_credito == "LoansiFlex":
+    st.markdown("<p class='plazo-text'>Plazo en Meses</p>", unsafe_allow_html=True)
+    plazo = st.slider("", min_value=detalles["plazo_min"], max_value=detalles["plazo_max"], step=12)
+    frecuencia_pago = "Mensual"
+else:
+    st.markdown("<p class='plazo-text'>Plazo en Semanas</p>", unsafe_allow_html=True)
+    plazo = st.slider("", min_value=detalles["plazo_min"], max_value=detalles["plazo_max"], step=1)
+    frecuencia_pago = "Semanal"
 
 # Slider de plazo
 if tipo_credito == "LoansiFlex":
