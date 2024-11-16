@@ -56,15 +56,42 @@ st.markdown("""
             background-color: #1E1E1E;
         }
         
-        /* Títulos y textos */
-        h1, h2, h3, label {
+        /* Títulos principales */
+        .main-title {
             color: #FFFFFF !important;
+            font-size: 1.4rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 0.5rem !important;
         }
         
+        /* Espaciado entre secciones */
+        .section-spacing {
+            margin-top: 2rem !important;
+        }
+        
+        /* Mejora del input con símbolo $ */
+        .currency-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .currency-symbol {
+            font-size: 1.2rem;
+            color: #FFFFFF;
+            padding-top: 0.3rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Ajuste del menú desplegable */
+        .stSelectbox {
+            margin-top: 0.3rem !important;
+        }
+
         .subtitle {
             color: #B0B0B0;
             font-size: 0.9rem;
-            margin-bottom: 1rem;
+            margin: 0.5rem 0 1.5rem 0;
         }
         
         /* Selectbox y inputs */
@@ -147,19 +174,21 @@ st.markdown("""
 st.markdown("<h1>Simulador de Crédito Loansi</h1>", unsafe_allow_html=True)
 
 # Selección de línea de crédito
-st.markdown("<p class='subtitle'>Selecciona la Línea de Crédito</p>", unsafe_allow_html=True)
+st.markdown("<p class='main-title'>Selecciona la Línea de Crédito</p>", unsafe_allow_html=True)
 tipo_credito = st.selectbox("", options=LINEAS_DE_CREDITO.keys(), index=0)
 detalles = LINEAS_DE_CREDITO[tipo_credito]
 
 st.markdown(f"<p class='subtitle'>{detalles['descripcion']}</p>", unsafe_allow_html=True)
 
 # Entrada del monto con símbolo de peso
-st.markdown("<p class='subtitle'>Escribe el valor del crédito</p>", unsafe_allow_html=True)
+st.markdown("<div class='section-spacing'></div>", unsafe_allow_html=True)
+st.markdown("<p class='main-title'>Escribe el valor del crédito</p>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>Ingresa un valor entre $ {format_number(detalles['monto_min'])} y $ {format_number(detalles['monto_max'])} COP</p>", unsafe_allow_html=True)
 
+# Contenedor para el símbolo $ y el input
 col1, col2 = st.columns([1,20])
 with col1:
-    st.markdown('<div style="padding-top: 15px; font-size: 1.2rem; color: #FFFFFF;">$</div>', unsafe_allow_html=True)
+    st.markdown('<div class="currency-symbol">$</div>', unsafe_allow_html=True)
 with col2:
     monto = st.number_input("", 
                            min_value=detalles["monto_min"],
