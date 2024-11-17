@@ -7,7 +7,7 @@ def format_number(number):
 # Datos para cada línea de crédito
 LINEAS_DE_CREDITO = {
     "LoansiFlex": {
-        "descripcion": "Crédito de libre inversión para empleados, independientes, personas naturales y pensionados.",
+        "descripcion": "Crédito de libre inversión para empleados, independientes, personas naturales y pensionados que puedan demostrar ingresos..",
         "monto_min": 1000000,
         "monto_max": 20000000,
         "plazo_min": 12,
@@ -15,10 +15,11 @@ LINEAS_DE_CREDITO = {
         "tasa_mensual": 1.9715,
         "tasa_anual_efectiva": 26.4,
         "aval_porcentaje": 0.10,
-        "seguro_vida_base": 150000
+        "seguro_vida_base": 150000,
+        "incremento_monto": 50000
     },
     "Microflex": {
-        "descripcion": "Crédito rotativo para personas en sectores informales, orientado a cubrir necesidades de liquidez rápida con pagos semanales.",
+        "descripcion": "Microflex es un crédito pensado especialmente para personas que trabajan de manera informal y necesitan liquidez rápida. Es una solución fácil y práctica con pagos semanales, ideal para quienes buscan una alternativa confiable al crédito gota a gota. Como es un crédito rotativo, solo pagas el aval y los costos asociados la primera vez. Si necesitas un nuevo crédito por un valor mayor, estos costos se ajustarán al nuevo monto solicitado. ¡Obtén tu crédito con Microflex y olvídate de las complicaciones del crédito informal!",
         "monto_min": 50000,
         "monto_max": 500000,
         "plazo_min": 4,
@@ -26,6 +27,7 @@ LINEAS_DE_CREDITO = {
         "tasa_mensual": 2.0718,
         "tasa_anual_efectiva": 27.9,
         "aval_porcentaje": 0.12,
+        "incremento_monto": 10000
     }
 }
 
@@ -45,6 +47,10 @@ def calcular_seguro_vida(plazo, seguro_vida_base):
 # Estilos
 st.markdown("""
     <style>
+        .stApp {
+            background-color: #1E1E1E;
+        }
+        
         .stSelectbox {
             margin-top: 0.2rem !important;
         }
@@ -81,11 +87,15 @@ st.markdown("""
             font-size: 1.2rem !important;
         }
 
+        .stSlider .stMarkLabel {
+            font-size: 1.1rem !important;
+        }
+
         .currency-symbol {
             font-size: 1.3rem;
             color: #FFFFFF;
-            margin-top: 0.7rem;
-            margin-left: 0.2rem;
+            margin-top: 1.3rem;  /* Ajustado */
+            margin-right: 0.3rem;  /* Ajustado */
         }
 
         .result-box {
@@ -125,10 +135,25 @@ st.markdown("""
             color: #FFFFFF;
             font-weight: 500;
         }
+
+        /* Estilo para el mensaje legal */
+        .legal-disclaimer {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .legal-disclaimer p {
+            color: #B0B0B0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0;
+            text-align: justify;
+        }
     </style>
 """, unsafe_allow_html=True)
-
-st.markdown("<h1>Simulador de Crédito Loansi</h1>", unsafe_allow_html=True)
 
 # Selección de línea de crédito
 st.markdown("<p style='color: #FFFFFF; font-size: 1.4rem; font-weight: 700; margin-bottom: 0.2rem;'>Selecciona la Línea de Crédito</p>", unsafe_allow_html=True)
@@ -148,7 +173,7 @@ with col2:
     monto = st.number_input("", 
                            min_value=detalles["monto_min"],
                            max_value=detalles["monto_max"],
-                           step=1000,
+                           step=detalles["incremento_monto"],
                            format="%d",
                            key="monto_input")
 
@@ -221,3 +246,10 @@ with st.expander("Ver Detalles del Crédito"):
             <span class="detail-value">{valor}</span>
         </div>
         """, unsafe_allow_html=True)
+    
+# Mensaje legal después de los detalles
+st.markdown("""
+<div class="legal-disclaimer">
+    <p>Este simulador es una herramienta informativa proporcionada por Loansi. Los resultados son estimaciones y no representan una oferta definitiva de crédito. La tasa final y condiciones del préstamo pueden variar según tu perfil crediticio, capacidad de pago y las condiciones del mercado al momento de la solicitud. Para obtener información detallada, comunícate con nuestros asesores.</p>
+</div>
+""", unsafe_allow_html=True)
