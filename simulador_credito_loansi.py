@@ -1,3 +1,17 @@
+import threading
+import time
+
+# Función que simula una actividad para mantener la app activa
+def keep_awake():
+    while True:
+        time.sleep(600)  # Espera 10 minutos
+        print("Manteniendo la app activa...")
+
+# Inicia el hilo de actividad
+thread = threading.Thread(target=keep_awake, daemon=True)
+thread.start()
+
+# Aquí comienza tu código original
 import streamlit as st
 
 # Función para formatear números con separadores de miles
@@ -7,7 +21,7 @@ def format_number(number):
 # Datos para cada línea de crédito
 LINEAS_DE_CREDITO = {
     "LoansiFlex": {
-        "descripcion": "Crédito de libre inversión para empleados, independientes, personas naturales y pensionados que puedan demostrar ingresos..",
+        "descripcion": "Crédito de libre inversión para empleados, independientes, personas naturales y pensionados.",
         "monto_min": 1000000,
         "monto_max": 20000000,
         "plazo_min": 12,
@@ -15,11 +29,10 @@ LINEAS_DE_CREDITO = {
         "tasa_mensual": 1.9715,
         "tasa_anual_efectiva": 26.4,
         "aval_porcentaje": 0.10,
-        "seguro_vida_base": 150000,
-        "incremento_monto": 50000
+        "seguro_vida_base": 150000
     },
     "Microflex": {
-        "descripcion": "Microflex es un crédito pensado especialmente para personas que trabajan de manera informal y necesitan liquidez rápida. Es una solución fácil y práctica con pagos semanales, ideal para quienes buscan una alternativa confiable al crédito gota a gota. Como es un crédito rotativo, solo pagas el aval y los costos asociados la primera vez. Si necesitas un nuevo crédito por un valor mayor, estos costos se ajustarán al nuevo monto solicitado. ¡Obtén tu crédito con Microflex y olvídate de las complicaciones del crédito informal!",
+        "descripcion": "Crédito rotativo para personas en sectores informales, orientado a cubrir necesidades de liquidez rápida con pagos semanales.",
         "monto_min": 50000,
         "monto_max": 500000,
         "plazo_min": 4,
@@ -27,7 +40,6 @@ LINEAS_DE_CREDITO = {
         "tasa_mensual": 2.0718,
         "tasa_anual_efectiva": 27.9,
         "aval_porcentaje": 0.12,
-        "incremento_monto": 10000
     }
 }
 
@@ -47,10 +59,6 @@ def calcular_seguro_vida(plazo, seguro_vida_base):
 # Estilos
 st.markdown("""
     <style>
-        .stApp {
-            background-color: #1E1E1E;
-        }
-        
         .stSelectbox {
             margin-top: 0.2rem !important;
         }
@@ -87,15 +95,11 @@ st.markdown("""
             font-size: 1.2rem !important;
         }
 
-        .stSlider .stMarkLabel {
-            font-size: 1.1rem !important;
-        }
-
         .currency-symbol {
             font-size: 1.3rem;
             color: #FFFFFF;
-            margin-top: 1.3rem;  /* Ajustado */
-            margin-right: 0.3rem;  /* Ajustado */
+            margin-top: 0.7rem;
+            margin-left: 0.2rem;
         }
 
         .result-box {
@@ -135,121 +139,9 @@ st.markdown("""
             color: #FFFFFF;
             font-weight: 500;
         }
-
-        /* Estilo para el mensaje legal */
-        .legal-disclaimer {
-            background-color: rgba(255, 255, 255, 0.03);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .legal-disclaimer p {
-            color: #B0B0B0;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            margin: 0;
-            text-align: justify;
-        }
     </style>
 """, unsafe_allow_html=True)
 
-# Selección de línea de crédito
-st.markdown("<p style='color: #FFFFFF; font-size: 1.4rem; font-weight: 700; margin-bottom: 0.2rem;'>Selecciona la Línea de Crédito</p>", unsafe_allow_html=True)
-tipo_credito = st.selectbox("", options=LINEAS_DE_CREDITO.keys(), index=0, key="select_credito")
-detalles = LINEAS_DE_CREDITO[tipo_credito]
+st.markdown("<h1>Simulador de Crédito Loansi</h1>", unsafe_allow_html=True)
 
-st.markdown(f"<p class='description-text'>{detalles['descripcion']}</p>", unsafe_allow_html=True)
-
-# Entrada del monto con símbolo de peso
-st.markdown("<p style='color: #FFFFFF; font-size: 1.4rem; font-weight: 700; margin: 1.5rem 0 0.2rem;'>Escribe el valor del crédito</p>", unsafe_allow_html=True)
-st.markdown(f"<p class='value-description'>Ingresa un valor entre $ {format_number(detalles['monto_min'])} y $ {format_number(detalles['monto_max'])} COP</p>", unsafe_allow_html=True)
-
-col1, col2 = st.columns([0.5,20])
-with col1:
-    st.markdown('<div class="currency-symbol">$</div>', unsafe_allow_html=True)
-with col2:
-    monto = st.number_input("", 
-                           min_value=detalles["monto_min"],
-                           max_value=detalles["monto_max"],
-                           step=detalles["incremento_monto"],
-                           format="%d",
-                           key="monto_input")
-
-# Slider de plazo con estilo mejorado
-if tipo_credito == "LoansiFlex":
-    st.markdown("<p class='plazo-text'>Plazo en Meses</p>", unsafe_allow_html=True)
-    plazo = st.slider("", 
-                     min_value=detalles["plazo_min"], 
-                     max_value=detalles["plazo_max"], 
-                     step=12,
-                     key="slider_meses")
-    frecuencia_pago = "Mensual"
-else:
-    st.markdown("<p class='plazo-text'>Plazo en Semanas</p>", unsafe_allow_html=True)
-    plazo = st.slider("", 
-                     min_value=detalles["plazo_min"], 
-                     max_value=detalles["plazo_max"], 
-                     step=1,
-                     key="slider_semanas")
-    frecuencia_pago = "Semanal"
-
-# Cálculos
-aval = monto * detalles["aval_porcentaje"]
-seguro_vida = calcular_seguro_vida(plazo, detalles.get("seguro_vida_base", 0)) if tipo_credito == "LoansiFlex" else 0
-total_financiar = monto + aval + total_costos_asociados + seguro_vida
-
-# Cálculo de cuota
-if tipo_credito == "LoansiFlex":
-    cuota = (total_financiar * (detalles["tasa_mensual"] / 100)) / (1 - (1 + detalles["tasa_mensual"] / 100) ** -plazo)
-else:
-    tasa_mensual = detalles["tasa_mensual"] / 100
-    tasa_semanal = ((1 + tasa_mensual) ** 0.25) - 1
-    cuota = round((total_financiar * tasa_semanal) / (1 - (1 + tasa_semanal) ** -plazo))
-
-# Mostrar resultado con orden invertido
-st.markdown(f"""
-<div class="result-box">
-    <p class="result-text">Pagarás {plazo} cuotas por un valor aproximado de:</p>
-    <div class="result-amount">$ {format_number(cuota)} {frecuencia_pago}</div>
-</div>
-""", unsafe_allow_html=True)
-
-# Detalles del crédito
-with st.expander("Ver Detalles del Crédito"):
-    total_interes = cuota * plazo - total_financiar
-    total_pagar = cuota * plazo
-    
-    detalles_orden = [
-        ("Monto Solicitado", f"$ {format_number(monto)} COP"),
-        ("Plazo", f"{plazo} {'meses' if tipo_credito == 'LoansiFlex' else 'semanas'}"),
-        ("Frecuencia de Pago", frecuencia_pago),
-        ("Tasa de Interés Mensual", f"{detalles['tasa_mensual']}%"),
-        ("Tasa Efectiva Anual (E.A.)", f"{detalles['tasa_anual_efectiva']}%"),
-        ("Costo del Aval", f"$ {format_number(aval)} COP"),
-        ("Costos Asociados", f"$ {format_number(total_costos_asociados)} COP"),
-    ]
-    
-    if tipo_credito == "LoansiFlex":
-        detalles_orden.append(("Seguro de Vida", f"$ {format_number(seguro_vida)} COP"))
-    
-    detalles_orden.extend([
-        ("Total Intereses", f"$ {format_number(total_interes)} COP"),
-        ("Total a Pagar", f"$ {format_number(total_pagar)} COP")
-    ])
-    
-    for titulo, valor in detalles_orden:
-        st.markdown(f"""
-        <div class="detail-item">
-            <span class="detail-label">{titulo}</span>
-            <span class="detail-value">{valor}</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-# Mensaje legal después de los detalles
-st.markdown("""
-<div class="legal-disclaimer">
-    <p>Este simulador es una herramienta informativa proporcionada por Loansi. Los resultados son estimaciones y no representan una oferta definitiva de crédito. La tasa final y condiciones del préstamo pueden variar según tu perfil crediticio, capacidad de pago y las condiciones del mercado al momento de la solicitud. Para obtener información detallada, comunícate con nuestros asesores.</p>
-</div>
-""", unsafe_allow_html=True)
+# Continúa el resto de tu código...
