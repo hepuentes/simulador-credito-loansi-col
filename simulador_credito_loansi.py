@@ -1,3 +1,17 @@
+import threading
+import time
+
+# Función que simula una actividad para mantener la app activa
+def keep_awake():
+    while True:
+        time.sleep(600)  # Espera 10 minutos
+        print("Manteniendo la app activa...")
+
+# Inicia el hilo de actividad
+thread = threading.Thread(target=keep_awake, daemon=True)
+thread.start()
+
+
 import streamlit as st
 
 # Función para formatear números con separadores de miles
